@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      内联 SVG 图标：省掉浏览器自动发起的 /favicon.ico 请求
+      （没有它每次打开都会 404，控制台留一条红色报错），也不额外引入二进制文件。
+    -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E6%B8%B8%3C/text%3E%3C/svg%3E"
+    />
     <title>本地小游戏 / Game Hub</title>
   </head>
   <body>
