@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+dist-single
+# 对外访问用到的第三方二进制（cloudflared，53MB），首次运行自动下载
+.tools
+# 单文件构建的中间产物
+.single-tmp
+*.local
+*.log
+# Vite 偶尔遗留的临时配置文件
+*.timestamp-*.mjs
+.DS_Store

@@ -1,0 +1,64 @@
+sequenceDiagram
+    autonumber
+    actor U as 用户
+    participant App
+    participant GV as GameView
+    participant SG as StartGate
+    participant DP as DifficultyPicker
+    participant HF as useDifficultyPreference
+    participant GS as useGameStats
+    participant LS as useLocalStorage
+    participant G as GameComponent
+    participant SB as StatSidebar
+    participant LB as Leaderboard
+
+    Note over U,LB: 场景 A · 首次进入 → 选难度 → 开始（数据层写入 + 排行榜更新）
+    U->>App: 点击大厅卡片
+    App->>GV: 挂载（started=false, sessionKey=0）
+    GV->>HF: useDifficultyPreference(gameId)
+    HF->>LS: 读 gamehub:difficulty（空 → {}）
+    LS-->>HF: {}
+    HF-->>GV: difficulty=medium（DEFAULT）
+    GV->>SG: 渲染（difficulty=medium）
+    U->>DP: 点击「困难」
+    DP->>HF: setDifficulty(hard)
+    HF->>LS: 写 {gameId:hard}
+    DP-->>SG: 重渲染 summary「6×6 · 约6分钟」
+    U->>SG: 点击「开始」
+    SG->>GV: onStart() → sessionKey+1, started=true
+    GV->>GS: useGameStats(id) 建 Context
+    GS->>LS: 读 gamehub:stats:id（revive=migrateStats）
+    Note over GS,LS: 旧结构 {accuracy:{best,recent},…}<br/>→ {v:1, records:[{difficulty:medium,timestamp:1或2}]}
+    LS-->>GS: StatsStore
+    GS->>SB: records + difficulty=hard
+    GS->>GV: GameSession{difficulty,params,sessionId,record,restartToGate,restartSame}
+    GV->>G: 挂载（key=sessionKey）——此刻才执行组件内 useEffect
+    Note over G: 游戏按 params 渲染（记忆类内容此时才生成）
+    GV->>GV: started && Timer → 计时从 0 开始
+    U->>G: 完成一局
+    G->>GS: record({accuracy:92, time:38120})
+    GS->>GS: upsert(id=gameId:hard:1) → sort → trim(≤10)
+    GS->>LS: 写 {v:1, records:[…]}
+    GS-->>SB: records 变化
+    SB->>LB: 传 records
+    LB->>LB: deriveBestRecent(records,hard) + computeRanks
+    LB-->>U: 侧栏「历史最优 92%」+ 排行榜第 ① 行
+
+    Note over U,LB: 场景 B · 局内换难度 / 重新开始（必回遮罩，H4）
+    U->>G: 点击「重新开始」
+    G->>GV: restartToGate()
+    GV->>GV: setStarted(false)
+    GV-->>G: 卸载（清理 state / interval / raf / timeout）
+    GV->>SG: 挂载遮罩（保留上次 hard 预选）
+    U->>DP: 改选「简单」
+    DP->>HF: setDifficulty(easy)
+    Note over GV,G: 全程 GameComponent 未挂载 →<br/>不存在 useEffect(start) 泄露（D-08）
+
+    Note over U,LB: 场景 C · 清空
+    U->>LB: 点击「清空本游戏记录」
+    LB->>LB: setConfirming(true) → 内联二次确认
+    U->>LB: 确认清空
+    LB->>GS: onClear()
+    GS->>LS: 写 {v:1, records:[]}
+    GS-->>LB: records=[]
+    LB-->>U: 空态「暂无成绩，快去玩一局」

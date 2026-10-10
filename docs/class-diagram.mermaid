@@ -1,0 +1,144 @@
+classDiagram
+    class Difficulty {
+        <<type>>
+        easy
+        medium
+        hard
+    }
+
+    class DifficultyOption {
+        +string label
+        +string summary
+        +Object params
+    }
+
+    class DifficultyGroup {
+        <<type>>
+        +Difficulty difficulty
+        +ScoreRecord[] records
+    }
+
+    class GameEntry {
+        +string id
+        +string name
+        +string description
+        +string icon
+        +string category
+        +string intro
+        +string howto
+        +Object difficulties
+        +Component component
+        +getOption(difficulty) DifficultyOption
+    }
+
+    class ScoreRecord {
+        +string id
+        +Difficulty difficulty
+        +number|null accuracy
+        +number|null time
+        +number timestamp
+        +boolean migrated
+    }
+
+    class StatsStore {
+        +number v
+        +ScoreRecord[] records
+    }
+
+    class MetricPair {
+        +number|null best
+        +number|null recent
+    }
+
+    class GameSessionContext {
+        +Difficulty difficulty
+        +Object params
+        +string sessionId
+        +record(vals) void
+        +setDifficulty(d) void
+        +restartToGate() void
+        +restartSame() void
+    }
+
+    class DifficultyUtils {
+        <<module: difficulty.js>>
+        +DIFFICULTY_KEYS
+        +DIFFICULTY_META
+        +DEFAULT_DIFFICULTY
+        +LEADERBOARD_LIMIT
+        +DIFFICULTY_STORAGE_KEY
+        +isDifficulty(v) boolean
+        +difficultyLabel(d) string
+        +difficultyChipClass(d) string
+        +compareRecords(a, b) number
+        +sortRecords(list) ScoreRecord[]
+        +trimRecords(list, limit) ScoreRecord[]
+        +groupRecordsByDifficulty(list) DifficultyGroup[]
+        +deriveBestRecent(records, difficulty) Object
+        +sampleUnique(n, k) number[]
+        +sampleUniqueExcluding(n, k, exclude) number[]
+        +shuffleIndices(n) number[]
+        +shuffleArray(arr) Array
+        +medalClass(rank) string
+        +getOption(game, d) DifficultyOption
+        +getParams(game, d) Object
+        +normalizeRecord(raw, index) ScoreRecord
+        +upsertRecord(records, incoming) ScoreRecord[]
+        +migrateStats(raw) StatsStore
+    }
+
+    class useLocalStorage {
+        <<hook>>
+        +useLocalStorage(key, initial, revive) Array
+    }
+
+    class useDifficultyPreference {
+        <<hook>>
+        +useDifficultyPreference(gameId) Array
+    }
+
+    class useGameStats {
+        <<hook>>
+        +useGameStats(gameId) Object
+        +useGameSession() GameSession
+        +useGameRecord() Function
+    }
+
+    class App
+    class GameView
+    class StartGate
+    class DifficultyPicker
+    class DifficultyChip
+    class StatSidebar
+    class Leaderboard
+    class Timer
+    class GameComponent
+    class GameFooter
+
+    GameEntry "1" --> "*" DifficultyOption : difficulties
+    DifficultyOption --> Difficulty : key
+    StatsStore "1" *-- "0..30" ScoreRecord : records（每难度各 ≤10，总计 ≤3×10）
+    ScoreRecord --> Difficulty : difficulty
+    GameView --> DifficultyUtils : getParams
+    GameView --> App : onBack
+    GameView --> StartGate : 未开始时渲染
+    GameView --> DifficultyChip : 顶栏
+    GameView --> StatSidebar : records / difficulty / onClear
+    GameView --> Timer : started && key=sessionKey
+    GameView --> GameFooter : intro / howto
+    GameView --> GameComponent : started && key=sessionKey
+    StartGate --> DifficultyPicker : 内嵌
+    StartGate --> DifficultyOption : 读取 label / summary
+    StartGate --> DifficultyUtils : getOption
+    StatSidebar --> Leaderboard : 内嵌
+    StatSidebar --> DifficultyUtils : deriveBestRecent
+    Leaderboard --> DifficultyUtils : medalClass / chipClass / groupRecordsByDifficulty
+    useGameStats ..> StatsStore : 读写
+    useGameStats ..> GameSessionContext : 提供 value
+    useGameStats --> DifficultyUtils : upsertRecord / migrateStats
+    useDifficultyPreference --> useLocalStorage : gamehub:difficulty
+    useDifficultyPreference --> DifficultyUtils : isDifficulty / DEFAULT
+    useGameStats --> useLocalStorage : gamehub:stats:id
+    GameSessionContext ..> ScoreRecord : record 生成
+    GameComponent --> GameSessionContext : useGameSession()
+    GameComponent --> DifficultyUtils : sampleUnique / shuffle

@@ -1,0 +1,56 @@
+# 把构建产物自动发布到 GitHub Pages
+#
+# 推 main 分支即触发：装依赖 → 构建 → 上传 dist/ → 部署。
+# 部署完成后网址固定为 https://<用户名>.github.io/<仓库名>/（用户页则是 https://<用户名>.github.io/）
+#
+# 首次使用需要先在仓库 Settings → Pages 里把 Source 选成 **GitHub Actions**，
+# 否则这个工作流会构建成功但无处部署。
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 允许在 Actions 页面手动重跑
+
+permissions:
+  contents: read   # 读取代码
+  pages: write     # 部署到 Pages
+  id-token: write  # 部署所需的身份令牌
+
+# 同一分支只保留最新一次部署：连续 push 时取消旧的
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 有 package-lock.json，用 ci 保证依赖版本与锁文件严格一致
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
