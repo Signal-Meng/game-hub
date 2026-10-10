@@ -39,7 +39,12 @@ jobs:
 
       - run: npm run build
 
+      # enablement: true —— 首次运行时自动开启 Pages（Source = GitHub Actions）。
+      # 没有这个参数，新仓库的 Pages 未初始化会让本步报
+      # "Get Pages site failed … Not Found"，只能手动去网页开。
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
