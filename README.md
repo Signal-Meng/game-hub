@@ -6,6 +6,18 @@
 技术栈：**Vite + React 18 + Tailwind CSS**（纯 JSX，无 TypeScript，无 MUI，无路由库）。
 视图切换基于 React `state`（无需刷新页面、无需 react-router）。
 
+## 在线体验
+
+| | 地址 |
+| --- | --- |
+| **线上站点**（推荐） | <https://signal-meng.github.io/game-hub/> |
+| 源码仓库 | <https://github.com/Signal-Meng/game-hub> |
+
+线上站点由 GitHub Actions 自动部署：推 `main` 分支即触发构建并发布到 GitHub Pages，
+无需手动操作、也无需本机保持开机。纯静态、无后端，任何人可直接打开。
+
+想改代码或自己部署，见下方 [运行](#运行) 与 [对外访问](#对外访问不只在本机)。
+
 ## 运行
 
 ```bash
@@ -24,7 +36,10 @@ npm run public        # 公网访问：任何人凭 URL 可打开（⚠ 会暴�
 ## 对外访问（不只在本机）
 
 这个应用是**纯静态 + 状态全在 localStorage**，没有后端、没有数据库。
-所以「让别人访问」不需要买服务器，只要把 `dist/` 挂出去即可。三种做法按场景选：
+所以「让别人访问」不需要买服务器，只要把 `dist/` 挂出去即可。四种做法按场景选：
+
+> **只想让别人玩**，直接给 [线上站点](https://signal-meng.github.io/game-hub/) 即可 —— 见 ④。
+> 下面 ① ~ ③ 是**本机自用或临时分享**时的做法。
 
 ### ① 单文件：最省事，发给谁都能用
 
@@ -75,8 +90,28 @@ npm run public
 > 前提：这台机器能出网连到 Cloudflare。若所在网络有防火墙/代理拦截，
 > 隧道可能建立失败或域名无法访问 —— 此时用 ① 或 ②。
 
+### ④ 公网常驻：GitHub Pages（本项目当前采用）
+
+线上站点 <https://signal-meng.github.io/game-hub/> 就是这么来的。仓库已配好
+`.github/workflows/deploy-pages.yml`：**推 `main` 即自动构建并发布**，
+不需要手动跑任何命令，也不需要本机保持开机。
+
+```bash
+git push origin main     # 推上去，CI 自动构建 + 部署
+```
+
+> 依赖 GitHub 仓库与 Pages 额度（**公开仓库免费**）。首次需要仓库管理员在
+> Settings → Pages 把 Source 选成 **GitHub Actions**（工作流里的
+> `actions/configure-pages` 已带 `enablement: true`，通常会自动完成）。
+>
+> `vite.config.js` 的 `base: './'` 是**子路径部署的必要条件** ——
+> Pages 项目页的实际路径是 `/<仓库名>/` 而非根路径，用默认绝对路径会导致资源 404 白屏。
+
 **为什么不用 ngrok / Vercel / Netlify**：ngrok 新隧道强制注册账号；
-后两者需要登录凭据，而本项目既不是 git 仓库、也没有任何托管平台凭据。
+Vercel / Netlify 需要登录凭据才能 `push` 部署。本项目已接入 GitHub，
+Pages 免额外凭据、与仓库同源、零运维，因此没有再引入第三方托管。
+
+> 若日后要迁到 Vercel / Netlify —— `base: './'` 是相对路径，**换平台不必改配置**。
 
 ## 脱离 WorkBuddy 一键启动
 
