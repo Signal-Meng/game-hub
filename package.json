@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "build:single": "node scripts/build-single.mjs",
     "lan": "node scripts/tunnel.mjs",
-    "public": "node scripts/tunnel.mjs --public"
+    "public": "node scripts/tunnel.mjs --public",
+    "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

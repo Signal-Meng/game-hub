@@ -1,5 +1,8 @@
 # 本地小游戏合集 / Game Hub
 
+[![Deploy to GitHub Pages](https://github.com/Signal-Meng/game-hub/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Signal-Meng/game-hub/actions/workflows/deploy-pages.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 一个在浏览器内运行的**小游戏启动器**。带大厅菜单，可在游戏之间自由切换；
 架构设计为 **可插拔（pluggable）** —— 之后新增游戏，只需新建一个文件夹 + 在注册表里加一行。
 
