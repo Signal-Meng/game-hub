@@ -30,16 +30,24 @@ export default function StroopGame() {
   /**
    * 生成下一题。
    *
-   * 斯特鲁普效应的核心测量：字义与墨色冲突时反应变慢（Stroop interference）。
-   * 约 30% 的题为一致试验（congruent：字义 = 墨色），其余为不一致试验。
-   * 没有一致试验作为对照，用户可以学到「永远忽略字义」策略，从而消除干扰。
+   * 双层 Stroop 干扰设计：
+   * ① 刺激层：字义（「蓝」）与墨色（黄色）冲突 → 识字自动过程产生干扰
+   * ② 选项层：每个按钮的底色随机且不等于其标签色 → 扫描按钮时，
+   *    看到底色（如蓝色）但需要读标签（「黄」）→ 第二重干扰
+   * 约 30% 的题为一致试验（congruent：字义 = 墨色），作为基线对照。
    */
   const nextTrial = useCallback(() => {
     const isCongruent = Math.random() < 0.3
     const w = COLORS[Math.floor(Math.random() * COLORS.length)]
     const ink = isCongruent ? w : COLORS[Math.floor(Math.random() * COLORS.length)]
     setWord({ text: w.name, ink: ink.hex, inkKey: ink.key, isCongruent: w.key === ink.key })
-    setButtons(shuffleArray(COLORS))
+    // 每个按钮：标签固定，但底色从非自身颜色中随机选一个 → 用户必须读文字而非匹配颜色
+    const shuffled = shuffleArray(COLORS).map((c) => {
+      const others = COLORS.filter((x) => x.key !== c.key)
+      const fill = others[Math.floor(Math.random() * others.length)]
+      return { ...c, fill: fill.hex, fillKey: fill.key }
+    })
+    setButtons(shuffled)
     startRef.current = Date.now()
   }, [])
 
@@ -104,7 +112,8 @@ export default function StroopGame() {
           <div className="grid grid-cols-2 gap-3 w-full">
             {buttons.map((c) => (
               <button key={c.key} onClick={() => choose(c.key)}
-                className="py-3 rounded-xl text-slate-700 font-semibold text-lg shadow-sm hover:bg-slate-100 bg-slate-50 border border-slate-200 transition">
+                className="py-3 rounded-xl font-semibold text-lg shadow-sm transition text-white"
+                style={{ background: c.fill }}>
                 {c.name}
               </button>
             ))}
