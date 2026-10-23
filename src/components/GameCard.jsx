@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 /**
  * 大厅中的游戏卡片（GameCard）。
  *
@@ -6,7 +8,7 @@
  *
  * @param {{ game: import('../games/registry.js').GameEntry, onSelect: (id: string) => void }} props
  */
-export default function GameCard({ game, onSelect }) {
+function GameCard({ game, onSelect }) {
   const handleClick = () => onSelect(game.id)
 
   return (
@@ -29,3 +31,5 @@ export default function GameCard({ game, onSelect }) {
     </button>
   )
 }
+
+export default memo(GameCard)

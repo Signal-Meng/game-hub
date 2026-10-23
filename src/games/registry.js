@@ -94,16 +94,7 @@
  * @property {import('react').ComponentType} component
  */
 
-import SchulteGame from './schulte/index.jsx'
-import MemoryDigitsGame from './memorydigits/index.jsx'
-import StroopGame from './stroop/index.jsx'
-import VisualSearchGame from './visualsearch/index.jsx'
-import CancellationGame from './cancellation/index.jsx'
-import TrackingGame from './tracking/index.jsx'
-import SimonGame from './simon/index.jsx'
-import CorsiGame from './corsi/index.jsx'
-import MemoryMatchGame from './memorymatch/index.jsx'
-import RecognitionGame from './recognition/index.jsx'
+import { lazy } from 'react'
 import {
   metric,
   fmtMs,
@@ -145,7 +136,7 @@ export const games = [
       '舒尔特表（Schulte Table）是经典的注意力与视觉搜索训练工具，通过快速按顺序寻找数字，提升阅读速度与专注稳定性。',
     howto:
       '在网格中按 1→2→3… 的顺序依次点击数字，直到全部完成；开始前选择难度，网格规模与反馈闪现时长会随难度变化。用时越短、错点越少越好。',
-    component: SchulteGame,
+    component: lazy(() => import('./schulte/index.jsx')),
   },
   {
     id: 'stroop',
@@ -168,7 +159,7 @@ export const games = [
       '斯特鲁普效应（Stroop Effect）揭示：当字义与颜色冲突时，大脑会被字义自动干扰，这是测抗干扰能力的经典范式。',
     howto:
       '读出文字的“颜色”（不是字义），点击对应的颜色按钮。题量由难度决定，颜色按钮恒为四种。系统统计正确率、平均反应时与得分。',
-    component: StroopGame,
+    component: lazy(() => import('./stroop/index.jsx')),
   },
   {
     id: 'visualsearch',
@@ -177,9 +168,9 @@ export const games = [
     icon: '🔍',
     category: '专注力',
     difficulties: {
-      easy: { label: '简单', summary: '6 轮 · 固定小网格', par: 28000, params: { trials: 6, gridBase: 5, gridRand: 0 } },
-      medium: { label: '中等', summary: '8 轮 · 网格逐轮变大', par: 45000, params: { trials: 8, gridBase: 5, gridRand: 3 } },
-      hard: { label: '困难', summary: '12 轮 · 大网格', par: 80000, params: { trials: 12, gridBase: 7, gridRand: 2 } },
+      easy: { label: '简单', summary: '6 轮 · 固定小网格', par: 28000, params: { trials: 6, gridBase: 5, gridRand: 0, distractorLevel: 0 } },
+      medium: { label: '中等', summary: '8 轮 · 网格逐轮变大', par: 45000, params: { trials: 8, gridBase: 5, gridRand: 3, distractorLevel: 1 } },
+      hard: { label: '困难', summary: '12 轮 · 大网格', par: 80000, params: { trials: 12, gridBase: 7, gridRand: 2, distractorLevel: 2 } },
     },
     scoring: {
       family: 'tps',
@@ -191,7 +182,7 @@ export const games = [
       '视觉搜索训练在大量干扰项中快速定位目标，是提升“在信息洪流中找重点”能力的好方法。',
     howto:
       '在网格里尽快找出唯一的 ★ 并点击它，共若干轮，网格会逐轮变大（轮数与网格规模由难度决定）。记录平均搜索时间（越短越好）。',
-    component: VisualSearchGame,
+    component: lazy(() => import('./visualsearch/index.jsx')),
   },
   {
     id: 'cancellation',
@@ -214,7 +205,7 @@ export const games = [
       '划消测验（Cancellation Task）常用于评估持续注意力与处理速度，需要在密集信息中保持专注。',
     howto:
       '在密集数字网格中，点击划掉所有等于“目标数字”的格子，完成后点“检查”。网格规模由难度决定，系统统计准确率与用时。',
-    component: CancellationGame,
+    component: lazy(() => import('./cancellation/index.jsx')),
   },
   {
     id: 'tracking',
@@ -238,7 +229,7 @@ export const games = [
       '动态视觉追踪训练眼睛对移动目标的持续锁定能力，对阅读扫视与运动反应都有帮助。',
     howto:
       '保持鼠标/手指压在弹跳移动的红点上，坚持指定时长（由难度决定）。系统统计接触时长占比（接触率越高越好）。',
-    component: TrackingGame,
+    component: lazy(() => import('./tracking/index.jsx')),
   },
 
   // ---------------- 记忆力 ----------------
@@ -265,7 +256,7 @@ export const games = [
       '数字瞬时记忆考验你的短期记忆广度——大脑能同时“抓住”多少信息。',
     howto:
       '短暂呈现一串数字后隐藏，凭记忆把整串数字复述出来。答对则长度 +1，答错回落到起始长度（起始长度、上限与显示时长均由难度决定）。',
-    component: MemoryDigitsGame,
+    component: lazy(() => import('./memorydigits/index.jsx')),
   },
   {
     id: 'simon',
@@ -288,7 +279,7 @@ export const games = [
       'Simon 是经典的顺序记忆游戏，结合听觉（音调）与视觉（亮灯）双重编码，锻炼工作记忆。',
     howto:
       '记住亮灯顺序与对应音调，随后按顺序点击复现。每答对一轮序列按难度递增（起始步数与递增幅度由难度决定），记你一次能记住的最长步数。',
-    component: SimonGame,
+    component: lazy(() => import('./simon/index.jsx')),
   },
   {
     id: 'corsi',
@@ -311,7 +302,7 @@ export const games = [
       'Corsi 积木测验是测量“空间广度”的经典范式，考察你对位置顺序的短时记忆。',
     howto:
       '记住方块依次亮起的顺序，再按相同顺序点击复现。可用方块数量与起始步数由难度决定。每成功一轮 +1 步，挑战你的最长空间序列。',
-    component: CorsiGame,
+    component: lazy(() => import('./corsi/index.jsx')),
   },
   {
     id: 'memorymatch',
@@ -334,7 +325,7 @@ export const games = [
       '翻牌配对是训练短时视觉记忆的经典小游戏，靠记住已翻开的图案位置来高效配对。',
     howto:
       '翻开两张卡片，相同则配对成功，不同则盖回。用最少的步数把全部图案配对（对数与图案由难度决定）。',
-    component: MemoryMatchGame,
+    component: lazy(() => import('./memorymatch/index.jsx')),
   },
   {
     id: 'recognition',
@@ -359,7 +350,7 @@ export const games = [
       '再认记忆（Recognition）比“回忆”容易，但仍是记忆研究的核心——从混合项中认出见过的东西。',
     howto:
       '先看一组图形数秒并记住，随后从旧图形与干扰图形组成的混合组中挑出你见过的（记忆项数、呈现时长与干扰项数由难度决定）。',
-    component: RecognitionGame,
+    component: lazy(() => import('./recognition/index.jsx')),
   },
 ]
 

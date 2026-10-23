@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react'
+import { useState, useRef, useCallback, useLayoutEffect, useEffect } from 'react'
 import { useGameSession } from '../../hooks/useGameStats.js'
 import { compositeScore, computeTps, penaltyRate } from '../../scoring.js'
 import RestartBar from '../../components/RestartBar.jsx'
@@ -14,6 +14,7 @@ export default function CancellationGame() {
   const [picked, setPicked] = useState(() => new Set())
   const [result, setResult] = useState(null)
   const startRef = useRef(0)
+  const autoSubmitRef = useRef(null)
 
   const start = () => {
     const t = 1 + Math.floor(Math.random() * 9)
@@ -37,6 +38,18 @@ export default function CancellationGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId])
 
+  // 自动提交：当已选数量等于目标总数时，延迟 200ms 自动触发 submit，
+  // 让用户看到最后一个格子被选中的反馈。忘记点「检查」不再导致计时虚高。
+  useEffect(() => {
+    if (phase !== 'play') return undefined
+    const targetCount = cells.filter((v) => v === target).length
+    if (targetCount > 0 && picked.size === targetCount) {
+      autoSubmitRef.current = setTimeout(() => submit(), 200)
+      return () => clearTimeout(autoSubmitRef.current)
+    }
+    return undefined
+  }, [picked, cells, target, phase, submit])
+
   const toggle = (i) => {
     if (phase !== 'play') return
     setPicked((prev) => {
@@ -46,7 +59,7 @@ export default function CancellationGame() {
     })
   }
 
-  const submit = () => {
+  const submit = useCallback(() => {
     const total = cells.filter((v) => v === target).length
     let hits = 0, fa = 0
     picked.forEach((i) => {
@@ -71,7 +84,7 @@ export default function CancellationGame() {
     })
     setResult({ total, hits, misses, fa, acc, time: Math.round(timeMs / 1000), tps: myTps, scanned })
     setPhase('done')
-  }
+  }, [cells, picked, target, par, record])
 
   // 格子尺寸随规模自适应，避免 10×10 在窄屏横向溢出。
   // 验算（375px 视口可用宽 293px = 375 − main px-4×2 − 卡片 p-6×2 − border×2）：
@@ -106,7 +119,7 @@ export default function CancellationGame() {
         </div>
       )}
       {phase === 'done' && result && (
-        <div className="text-center">
+        <div className="animate-scale-in text-center">
           <p className="text-2xl font-bold text-emerald-600">完成！</p>
           <p className="mt-2 text-slate-600">正确划掉：<b>{result.hits}/{result.total}</b> · 漏划：{result.misses} · 误划：{result.fa}</p>
           <p className="text-slate-600">准确率：<b>{result.acc}%</b> · 用时：{result.time}s</p>

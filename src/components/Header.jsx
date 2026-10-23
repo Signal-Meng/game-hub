@@ -1,8 +1,10 @@
+import { memo } from 'react'
+
 /**
  * 顶部标题栏（Header）。
  * 显示产品标题与一句副标题，保持简洁扁平、浅色主题。
  */
-export default function Header() {
+function Header() {
   return (
     <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -22,3 +24,5 @@ export default function Header() {
     </header>
   )
 }
+
+export default memo(Header)

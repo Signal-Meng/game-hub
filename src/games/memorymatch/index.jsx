@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import { useGameSession } from '../../hooks/useGameStats.js'
 import { shuffleArray } from '../../difficulty.js'
 import { compositeScore, hitRate } from '../../scoring.js'
@@ -34,9 +34,9 @@ export default function MemoryMatchGame() {
 
   // 挂载即开局。本组件只在 started 为真时挂载（遮罩期不存在），
   // 因此这个 effect 绝不会在遮罩显示期间执行 —— 这正是条件渲染的价值。
-  useEffect(() => { start() }, [sessionId])
+  useLayoutEffect(() => { start() }, [sessionId])
 
-  useEffect(() => () => timer.current && clearTimeout(timer.current), [])
+  useLayoutEffect(() => () => timer.current && clearTimeout(timer.current), [])
 
   const flip = (i) => {
     if (lock || won || flipped.includes(i) || cards[i]?.done) return
@@ -87,7 +87,7 @@ export default function MemoryMatchGame() {
       </div>
       <RestartBar restartToGate={restartToGate} restartSame={restartSame} />
       {won && (
-        <p className="text-xl font-bold text-emerald-600">全部配对完成！用了 {moves} 步</p>
+        <p className="animate-scale-in text-xl font-bold text-emerald-600">全部配对完成！用了 {moves} 步</p>
       )}
     </div>
   )

@@ -1,6 +1,7 @@
 import { useState, useRef, useLayoutEffect, useMemo } from 'react'
 import { useGameSession } from '../../hooks/useGameStats.js'
 import RestartBar from '../../components/RestartBar.jsx'
+import { useSequencePlayer } from '../../hooks/useSequencePlayer.js'
 import { sampleUnique, shuffleIndices } from '../../difficulty.js'
 import { spanScore, hitRate } from '../../scoring.js'
 
@@ -25,10 +26,7 @@ export default function CorsiGame() {
   const bestSpanRef = useRef(null)
   const seqRef = useRef([])
   const inputRef = useRef(0)
-  // 挂载即开局后 playback 必在挂载时启动；用户可能在 playback / input 期间点「重新开始」
-  // 回遮罩并卸载本组件，故所有递归 setTimeout 统一登记、卸载时一次性清理。
-  const timersRef = useRef(new Set())
-  const aliveRef = useRef(false)
+  const { aliveRef, later, clearTimers } = useSequencePlayer()
 
   /**
    * 构造本局成绩快照（record 是整行替换语义，每次必须给全）。
@@ -47,19 +45,6 @@ export default function CorsiGame() {
       span: best,
       accuracy: hitRate(okCount, totalSeqs),
     }
-  }
-
-  /**
-   * 登记式 setTimeout：组件卸载后不再续期递归链，
-   * 避免 playback 播放途中「重新开始」导致对已卸载组件 setState。
-   */
-  const later = (fn, ms) => {
-    if (!aliveRef.current) return
-    const id = setTimeout(() => {
-      timersRef.current.delete(id)
-      if (aliveRef.current) fn()
-    }, ms)
-    timersRef.current.add(id)
   }
 
   /**
@@ -106,12 +91,10 @@ export default function CorsiGame() {
    */
   useLayoutEffect(() => {
     aliveRef.current = true
-    const timers = timersRef.current
     startGame()
     return () => {
       aliveRef.current = false
-      timers.forEach(clearTimeout)
-      timers.clear()
+      clearTimers()
     }
     // startGame 每局只应执行一次，故刻意不列进依赖（它每次渲染都是新引用）
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +145,7 @@ export default function CorsiGame() {
         })}
       </div>
       {phase === 'done' && (
-        <div className="text-center">
+        <div className="animate-scale-in text-center">
           <p className="text-xl font-bold text-rose-500">{msg}</p>
         </div>
       )}

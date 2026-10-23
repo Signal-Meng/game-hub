@@ -226,7 +226,11 @@ export default function Leaderboard({ records, difficulty, metrics, onClear }) {
       {open && (
         <>
           {total === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">暂无成绩，快去玩一局</p>
+            <div className="flex flex-col items-center gap-2 py-10">
+              <span className="text-4xl opacity-20" aria-hidden="true">🏆</span>
+              <p className="text-sm text-slate-400">暂无成绩</p>
+              <p className="text-xs text-slate-300">完成一局后，成绩将出现在这里</p>
+            </div>
           ) : emptyCurrent ? (
             <div className="py-8 text-center">
               <p className="text-sm text-slate-400">

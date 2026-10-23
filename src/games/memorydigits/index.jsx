@@ -161,7 +161,7 @@ export default function MemoryDigitsGame() {
           </div>
         )}
         {phase === 'result' && (
-          <div className="text-center">
+          <div className="animate-scale-in text-center">
             <p className={`text-2xl font-bold ${lastCorrect ? 'text-emerald-600' : 'text-rose-500'}`}>
               {lastCorrect ? '✅ 正确！' : '❌ 答错了'}
             </p>

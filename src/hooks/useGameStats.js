@@ -60,12 +60,6 @@ const NOOP_SESSION = {
 export const GameSessionContext = createContext(NOOP_SESSION)
 
 /**
- * 兼容别名：改造前的 Context 名。保留以免遗漏引用点。
- * @deprecated 请改用 GameSessionContext / useGameSession
- */
-export const GameRecordContext = GameSessionContext
-
-/**
  * 游戏视图层使用：读写某游戏的成绩记录数组（StatsStore），
  * 并提供 session 级 upsert 的 record 函数与清空能力。
  *
@@ -152,13 +146,4 @@ export function useGameStats(game) {
  */
 export function useGameSession() {
   return useContext(GameSessionContext)
-}
-
-/**
- * 游戏组件使用：拿到上报成绩的 record 函数（由 GameView 经 Context 提供）。
- * 兼容改造前的调用方式，等价于 `useGameSession().record`。
- * @returns {(vals: {accuracy?: number, time?: number}) => void}
- */
-export function useGameRecord() {
-  return useContext(GameSessionContext).record
 }

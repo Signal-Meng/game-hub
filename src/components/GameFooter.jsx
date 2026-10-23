@@ -1,9 +1,11 @@
+import { memo } from 'react'
+
 /**
  * 游戏底部说明区：展示「游戏介绍」与「玩法」，由 registry 的 intro / howto 字段提供。
  *
  * @param {{ intro?: string, howto?: string }} props
  */
-export default function GameFooter({ intro, howto }) {
+function GameFooter({ intro, howto }) {
   if (!intro && !howto) return null
   return (
     <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -20,3 +22,5 @@ export default function GameFooter({ intro, howto }) {
     </div>
   )
 }
+
+export default memo(GameFooter)

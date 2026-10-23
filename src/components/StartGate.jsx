@@ -1,3 +1,4 @@
+import { useEffect, useCallback } from 'react'
 import DifficultyPicker from './DifficultyPicker.jsx'
 
 /**
@@ -16,6 +17,21 @@ import DifficultyPicker from './DifficultyPicker.jsx'
  * @param {() => void} props.onBack 「返回大厅」
  */
 export default function StartGate({ game, difficulty, onSelectDifficulty, onStart, onBack }) {
+  const handleKeyDown = useCallback(
+    (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && difficulty && onStart) {
+        e.preventDefault()
+        onStart()
+      }
+    },
+    [difficulty, onStart],
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
   return (
     <div className="flex min-h-[24rem] items-center justify-center rounded-2xl bg-white p-2">
       <div className="max-h-[80vh] w-full max-w-xl overflow-y-auto">

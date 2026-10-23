@@ -10,8 +10,13 @@ export default function Timer() {
 
   useEffect(() => {
     startRef.current = Date.now()
-    const id = setInterval(() => setMs(Date.now() - startRef.current), 200)
-    return () => clearInterval(id)
+    let raf
+    const tick = () => {
+      setMs(Date.now() - startRef.current)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
   }, [])
 
   const s = Math.floor(ms / 1000)

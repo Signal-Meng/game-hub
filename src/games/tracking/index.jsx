@@ -29,7 +29,7 @@ export default function TrackingGame() {
   const lastTs = useRef(0)
   const rafRef = useRef(0)
   const endRef = useRef(0)
-  const [dot, setDot] = useState({ x: MAX_W / 2, y: H / 2 })
+  const dotRef = useRef(null)
 
   /**
    * 实测容器宽度：容器是 w-full + max-w-[380px]，因此窄屏自动收窄、宽屏维持 380。
@@ -65,7 +65,7 @@ export default function TrackingGame() {
       const pt = pointer.current
       if (pt && Math.hypot(pt.x - p.x, pt.y - p.y) < r) onMs.current += dt
       totalMs.current += dt
-      setDot({ x: p.x, y: p.y })
+      if (dotRef.current) dotRef.current.style.transform = `translate(${p.x - r}px, ${p.y - r}px)`
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
@@ -133,14 +133,14 @@ export default function TrackingGame() {
             ref={areaRef}
             className="relative w-full max-w-[380px] bg-slate-100 rounded-2xl overflow-hidden touch-none"
             style={{ height: H }}>
-            <div className="absolute rounded-full bg-rose-500"
-              style={{ width: r * 2, height: r * 2, left: dot.x - r, top: dot.y - r }} />
+            <div ref={dotRef} className="absolute rounded-full bg-rose-500 will-change-transform"
+              style={{ width: r * 2, height: r * 2, left: 0, top: 0 }} />
           </div>
           <p className="text-slate-400 text-xs">移动鼠标/手指，让光标一直压在红点上</p>
         </div>
       )}
       {phase === 'done' && result && (
-        <div className="text-center">
+        <div className="animate-scale-in text-center">
           <p className="text-2xl font-bold text-emerald-600">完成！</p>
           <p className="mt-2 text-slate-600">本次追踪接触率：<b>{result.score}%</b></p>
         </div>

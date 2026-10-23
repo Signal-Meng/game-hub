@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { difficultyChipClass, difficultyLabel } from '../difficulty.js'
 
 /**
@@ -10,7 +11,7 @@ import { difficultyChipClass, difficultyLabel } from '../difficulty.js'
  * @param {import('../difficulty.js').Difficulty} props.difficulty 当前难度
  * @param {() => void} [props.onClick] 点击回调（GameView 传入 restartToGate）
  */
-export default function DifficultyChip({ difficulty, onClick }) {
+function DifficultyChip({ difficulty, onClick }) {
   const label = difficultyLabel(difficulty)
   return (
     <button
@@ -28,3 +29,5 @@ export default function DifficultyChip({ difficulty, onClick }) {
     </button>
   )
 }
+
+export default memo(DifficultyChip)

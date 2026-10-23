@@ -115,7 +115,7 @@ export default function RecognitionGame() {
         </div>
       )}
       {phase === 'done' && result && (
-        <div className="text-center">
+        <div className="animate-scale-in text-center">
           <p className="text-2xl font-bold text-emerald-600">完成！</p>
           <p className="mt-2 text-slate-600">认对：<b>{result.hits}/{study.length}</b> · 漏认：{result.miss} · 误认：{result.fa}</p>
           <p className="text-slate-600">准确率：<b>{result.acc}%</b></p>

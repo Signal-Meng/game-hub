@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { Suspense, useCallback, useMemo, useState } from 'react'
 import { GameSessionContext, useGameStats } from '../hooks/useGameStats.js'
 import { useDifficultyPreference } from '../hooks/useDifficultyPreference.js'
 import { getParams, getPar } from '../difficulty.js'
@@ -127,7 +127,13 @@ export default function GameView({ game, onBack }) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             {started ? (
-              <GameComponent key={sessionKey} />
+              <Suspense fallback={
+                <div className="flex min-h-[24rem] items-center justify-center rounded-2xl bg-white">
+                  <span className="text-sm text-slate-400">加载中…</span>
+                </div>
+              }>
+                <GameComponent key={sessionKey} />
+              </Suspense>
             ) : (
               <StartGate
                 game={game}
